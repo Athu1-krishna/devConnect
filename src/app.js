@@ -1,31 +1,66 @@
 const express = require('express');
 const app = express();
 const {connectDB} = require('./config/database')
-const User = require('./models/user')
+// const {adminAuth} = require('./middlewares/auth')
+const cookieParser = require('cookie-parser')
+const authRouter = require('./routes/auth');
+const profileRouter = require('./routes/profile');
+const requestRouter = require('./routes/request')
+app.use(express.json())
+app.use(cookieParser())
 
-const {adminAuth} = require('./middlewares/authMiddleware')
-app.use("/admin", adminAuth, (req, res) => {
-    res.send("data from admin")
-})
+app.use(authRouter);
+app.use(profileRouter);
+app.use(requestRouter);
 
-// signup api
-app.post("/signup", async (req, res) => {
-    const user = new User({
-        firstName: "athul",
-        lastName: "krishna",
-        email: "athul@krishna.com",
-        password: "athul123",
-    })
-    try{
-        await user.save();
-        res.send("signup successfully")
-    }
-    catch(err){
-        res.status(400).send("Error saving the user...!!!")
-    }
-    
-})
-
+// // feed api
+// app.get('/feed', async (req, res) => {
+//     try{
+//         const user = await User.find({});
+//         res.send(user);
+//     }
+//     catch(err){
+//         res.status(400).send("Something went wrong...")
+//     }
+// })
+// // get single user using email
+// app.get('/user', async (req, res) => {
+//     const userEmail = req.body.email;
+//     try{
+//         const user = await User.findOne({ email: userEmail})
+//         if(!user){
+//             res.status(404).send("User not found...")
+//         }else{
+//             res.send(user);
+//         }
+//     }
+//     catch(err){
+//         res.status(400).send("User not found....")
+//     }
+// })
+// // delete a user by user by user id
+// app.delete('/user', async (req, res) => {
+//     const userId = req.body.userId
+//     try{
+//         const user = await User.findByIdAndDelete({_id: userId})
+//         res.send("User deleted successfully...")
+//     }
+//     catch(err){
+//         res.status(400).send("Cannot delete user...")
+//     }
+// })
+// // update user api
+// app.patch('/user', async (req, res) => {
+//     const userId = req.body.userId;
+//     const data = req.body;
+//     try{
+//         await User.findByIdAndUpdate({_id: userId}, data)
+//         res.send("User updated successfully")
+//     }
+//     catch(err){
+//         res.status(400).send("Something went wrong!!!")
+//     }
+// })
 connectDB().then(()=>{
     console.log("db connection established...");
     app.listen(3000, ()=>{
